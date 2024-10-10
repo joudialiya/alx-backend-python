@@ -6,4 +6,4 @@ from typing import Tuple, Union
 
 def to_kv(k: str, v: Union[int, float]) -> Tuple[str, int | float]:
     """tuple annotation"""
-    return (k, v)
+    return (k, v ** 2)
