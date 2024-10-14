@@ -11,4 +11,4 @@ def measure_time(n: int, max_delay: int) -> int:
     """Task function"""
     start_clock = time.time()
     asyncio.run(wait_n(n, max_delay))
-    return (time.time - start_clock) / n
+    return (time.time() - start_clock) / n
