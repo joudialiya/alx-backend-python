@@ -5,7 +5,7 @@ import random
 import typing
 
 
-async def async_generator() -> typing.AsyncIterator[float]:
+async def async_generator() -> typing.Generator[float, None, None]:
     """Task function"""
     for _ in range(0, 10):
         await asyncio.sleep(1)
