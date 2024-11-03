@@ -60,7 +60,8 @@ class TestGithubOrgClient(unittest.TestCase):
     ])
     def test_has_license(self, repo: Dict, key: str, expected: bool):
         """Testing method (has_license)"""
-        self.assertEqual(GithubOrgClient.has_license(repo, key), expected)
+        client = GithubOrgClient('google')
+        self.assertEqual(client.has_license(repo, key), expected)
 
 
 @parameterized_class(
