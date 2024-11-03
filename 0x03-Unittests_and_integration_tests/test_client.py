@@ -89,7 +89,6 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
 
     def test_public_repos(self) -> None:
         """test public_repos method"""
-        print(GithubOrgClient("google").org)
         self.assertEqual(
             GithubOrgClient("google").public_repos(),
             self.expected_repos,
