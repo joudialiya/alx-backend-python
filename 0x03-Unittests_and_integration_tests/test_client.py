@@ -5,7 +5,7 @@ testing module
 import unittest
 from typing import Dict
 from unittest.mock import Mock, PropertyMock, patch
-from parameterized import parameterized
+from parameterized import parameterized, parameterized_class
 from client import GithubOrgClient
 from fixtures import TEST_PAYLOAD
 
@@ -53,3 +53,56 @@ class TestGithubOrgClient(unittest.TestCase):
             self.assertEqual(client.public_repos(), repos_list)
             mock_get.assert_called_once()
             mock_public_repos.assert_called_once()
+
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False)
+    ])
+    def test_has_license(self, repo: Dict, key: str, expected: bool):
+        """Testing method (has_license)"""
+        self.assertEqual(GithubOrgClient.has_license(repo, key), expected)
+
+
+@parameterized_class(
+    ('org_payload', 'repos_payload', 'expected_repos', 'apache2_repos'),
+    TEST_PAYLOAD
+)
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """Integration test"""
+    @classmethod
+    def setUpClass(cls):
+        """Setup method"""
+        routes = {
+            'https://api.github.com/orgs/google': cls.org_payload,
+            'https://api.github.com/orgs/google/repos': cls.repos_payload,
+        }
+
+        def get_payload(url):
+            if url in routes:
+                get_mock = Mock()
+                get_mock.json.return_value = routes[url]
+                return get_mock
+
+        cls.get_patcher = patch("requests.get", side_effect=get_payload)
+        cls.get_patcher.start()
+
+    def test_public_repos(self) -> None:
+        """test public_repos method"""
+        print(GithubOrgClient("google").org)
+        self.assertEqual(
+            GithubOrgClient("google").public_repos(),
+            self.expected_repos,
+        )
+
+    def test_public_repos_with_license(self) -> None:
+        """test public_repos method with a license."""
+        self.assertEqual(
+            GithubOrgClient("google").public_repos(license="apache-2.0"),
+            self.apache2_repos,
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        """Deconstructor method"""
+        cls.get_patcher.stop()
+        pass
